@@ -46,6 +46,11 @@ SENSOR_DESCRIPTIONS = [
         native_unit_of_measurement="meldingen",
     ),
     SensorEntityDescription(
+        key="historical_alerts_text",
+        name="📝 Incident Archief Tekst",
+        icon="mdi:text-box-multiple-outline",
+    ),
+    SensorEntityDescription(
         key="danger_compass",
         name="🧭 Pluim Risico Kompas",
         icon="mdi:compass-rose",
@@ -112,7 +117,7 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
                      self._attr_name, self._attr_unique_id)
 
     @property
-    def native_value(self) -> int | None:
+    def native_value(self) -> int | str | None:
         """Return the state of the sensor."""
         if self.entity_description.key == "alert_count":
             value = self.coordinator.data.get("active_count", 0)
@@ -121,6 +126,9 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
         elif self.entity_description.key == "historical_alerts":
             value = self.coordinator.data.get("historical_count", 0)
             _LOGGER.debug("Historical alerts sensor value: %s", value)
+        elif self.entity_description.key == "historical_alerts_text":
+            # Format historical alerts as readable text
+            value = self._format_historical_alerts_text()
         elif self.entity_description.key == "danger_compass":
             home_danger = self.coordinator.data.get("home_danger", {})
             value = home_danger.get("risk_percentage", 0)
@@ -275,5 +283,43 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
             return "Laag Risico"
         else:
             return "Veilig"
+
+    def _format_historical_alerts_text(self) -> str:
+        """Format historical alerts as readable text."""
+        historical_alerts = self.coordinator.data.get("historical_alerts", [])
+        
+        if not historical_alerts:
+            return "Geen historische meldingen beschikbaar"
+        
+        # Format last 10 alerts as text
+        text_lines = [f"Historische Meldingen ({len(historical_alerts)} totaal):", ""]
+        
+        for idx, alert in enumerate(historical_alerts[-10:], 1):  # Last 10 alerts
+            # Extract info data (can be list or dict)
+            info_data = {}
+            if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                info_data = alert["info"][0]
+            elif isinstance(alert.get("info"), dict):
+                info_data = alert["info"]
+            
+            # Extract area description
+            area_desc = ""
+            if isinstance(info_data.get("area"), list) and len(info_data["area"]) > 0:
+                area_desc = info_data["area"][0].get("areaDesc", "Onbekend gebied")
+            elif isinstance(info_data.get("area"), dict):
+                area_desc = info_data["area"].get("areaDesc", "Onbekend gebied")
+            
+            # Format alert information
+            headline = info_data.get("headline", "Geen beschrijving")
+            severity = info_data.get("severity", "Onbekend")
+            sent = alert.get("sent", "Onbekende datum")
+            
+            # Add formatted alert to text
+            text_lines.append(f"{idx}. {headline}")
+            text_lines.append(f"   Ernst: {severity} | Gebied: {area_desc}")
+            text_lines.append(f"   Verstuurd: {sent}")
+            text_lines.append("")
+        
+        return "\n".join(text_lines)
 
 
