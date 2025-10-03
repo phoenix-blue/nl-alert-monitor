@@ -183,6 +183,14 @@ title: "📝 Historische Meldingen"
 content: "{{ states('sensor.nl_alert_historical_alerts_text') }}"
 ```
 
+De tekst sensor toont de laatste 10 historische meldingen in leesbaar formaat. Elke melding bevat:
+- Beschrijving/headline van de melding
+- Ernst niveau (Minor, Moderate, Severe, Extreme)
+- Getroffen gebied
+- Verstuurd datum/tijd
+
+**Let op:** De sensor toont alleen relevante meldingen (chemische incidenten, branden, giftige stoffen, etc.).
+
 ## 🤖 Automations
 
 ### Automatische Ventilatie Controle
