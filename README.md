@@ -9,6 +9,8 @@ Een geavanceerde Home Assistant integratie voor het detecteren van gevaarlijke r
 
 <p align="center">
   <img src="images/icon.png" alt="NL-Alert Rookpluim Detector" width="200">
+  <br>
+  <em>🎨 Professioneel icoon met Nederlandse kleuren, waarschuwingssymbolen en windrichtingsindicatie</em>
 </p>
 
 ## 🔗 Officiële Databron
@@ -162,6 +164,7 @@ action:
 - **[Dashboard Cards](docs/DASHBOARD_CARDS.md)** - Uitgebreide Lovelace kaarten en visualisaties
 - **[Automatisering Blueprints](docs/AUTOMATISERING_BLUEPRINT.md)** - Ready-to-use automations
 - **[Troubleshooting Guide](docs/TROUBLESHOOTING_COMPLETE.md)** - Probleemoplossing en debugging
+- **[Integration Icons](ICONS_README.md)** - 🎨 Professionele iconen voor HACS en Home Assistant Brands
 
 ## 🤝 Bijdragen
 
