@@ -1,0 +1,7 @@
+test_alert:
+  name: "Test Alert Simulatie"
+  description: "Creëer een test alert voor het testen van de rookpluim detector"
+
+reset_alerts:
+  name: "Reset Alle Meldingen" 
+  description: "Wis alle actieve en historische alerts"

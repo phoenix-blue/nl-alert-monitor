@@ -1,0 +1,92 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NL-Alert Configuratie",
+        "description": "Stel NL-Alert meldingen in voor Home Assistant\n\nBeschikbare weer entiteiten:\n{weather_entities}",
+        "data": {
+          "update_interval": "Update interval",
+          "location_filter": "Locatiefilter inschakelen",
+          "severity_filter": "Minimale ernst niveau",
+          "language": "Taal",
+          "enable_plume_calculation": "Pluim berekening inschakelen",
+          "weather_entity": "Weer entiteit"
+        },
+        "data_description": {
+          "update_interval": "Hoe vaak (in seconden) de alerts worden gecontroleerd",
+          "weather_entity": "Selecteer een weer entiteit voor pluim berekeningen, of laat leeg voor standaard KNMI data",
+          "language": "Taal voor de interface en meldingen",
+          "enable_plume_calculation": "Schakel Gaussiaanse pluim modellering in voor gevaarlijke stoffen"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met de API",
+      "invalid_auth": "Ongeldige authenticatie",
+      "unknown": "Onbekende fout opgetreden"
+    },
+    "abort": {
+      "already_configured": "NL-Alert is al geconfigureerd"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "NL-Alert Instellingen",
+        "description": "Pas de NL-Alert instellingen aan\n\nHuidige weer entiteit: {current_weather}",
+        "data": {
+          "update_interval": "Update interval",
+          "severity_filter": "Minimale ernst niveau",
+          "language": "Taal",
+          "enable_plume_calculation": "Pluim berekening inschakelen",
+          "weather_entity": "Weer entiteit"
+        },
+        "data_description": {
+          "update_interval": "Hoe vaak (in seconden) de alerts worden gecontroleerd",
+          "weather_entity": "Selecteer een weer entiteit voor pluim berekeningen",
+          "language": "Taal voor de interface en meldingen"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "alert_count": {
+        "name": "Actieve Meldingen"
+      },
+      "severe_alerts": {
+        "name": "Ernstige Meldingen"
+      },
+      "historical_alerts": {
+        "name": "Historische Meldingen"
+      },
+      "plume_status": {
+        "name": "Pluim Status"
+      },
+      "plume_distance": {
+        "name": "Afstand tot Bron"
+      },
+      "plume_concentration": {
+        "name": "Relatieve Concentratie"
+      }
+    },
+    "binary_sensor": {
+      "active_alert": {
+        "name": "Actieve Melding"
+      },
+      "severe_alert": {
+        "name": "Ernstige Melding"
+      }
+    }
+  },
+  "services": {
+    "test_alert": {
+      "name": "🧪 Test Alert Simulatie",
+      "description": "Creëer een test alert om de rookpluim detector te testen"
+    },
+    "reset_alerts": {
+      "name": "🔄 Reset Alle Meldingen",
+      "description": "Wis alle actieve en historische alerts uit het systeem"
+    }
+  }
+}

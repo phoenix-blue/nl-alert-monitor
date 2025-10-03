@@ -1,0 +1,11 @@
+{
+  "name": "NL-Alert Rookpluim Detector",
+  "content_in_root": false,
+  "filename": "nl-alert-monitor",
+  "render_readme": true,
+  "domains": ["sensor"],
+  "iot_class": "Cloud Polling",
+  "homeassistant": "2023.1.0",
+  "zip_release": false,
+  "hide_default_branch": false
+}

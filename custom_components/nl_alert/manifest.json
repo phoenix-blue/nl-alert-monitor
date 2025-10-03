@@ -1,0 +1,14 @@
+{
+  "domain": "nl_alert",
+  "name": "🌨️ NL-Alert Rookpluim Detector",
+  "version": "2.1.0",
+  "documentation": "https://github.com/phoenix-blue/nl-alert-monitor",
+  "issue_tracker": "https://github.com/phoenix-blue/nl-alert-monitor/issues",
+  "dependencies": [],
+  "codeowners": ["@phoenix-blue"],
+  "requirements": ["aiohttp>=3.8.0", "async_timeout>=4.0.0"],
+  "iot_class": "cloud_polling",
+  "config_flow": true,
+  "after_dependencies": [],
+  "integration_type": "hub"
+}

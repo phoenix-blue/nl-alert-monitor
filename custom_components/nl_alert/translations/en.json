@@ -1,0 +1,78 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NL-Alert Rookpluim Detector",
+        "description": "Configure NL-Alert notifications for Home Assistant",
+        "data": {
+          "update_interval": "Update interval",
+          "location_filter": "Enable location filter",
+          "severity_filter": "Minimum severity level",
+          "language": "Language",
+          "enable_plume_calculation": "Enable plume calculation",
+          "weather_entity": "Weather entity"
+        },
+        "data_description": {
+          "update_interval": "How often (in seconds) to check for alerts",
+          "weather_entity": "Select a weather entity for plume calculations",
+          "language": "Language for interface and notifications",
+          "enable_plume_calculation": "Enable Gaussian plume modeling for hazardous substances"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the API",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unknown error occurred"
+    },
+    "abort": {
+      "already_configured": "NL-Alert is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "NL-Alert Settings",
+        "description": "Modify NL-Alert settings",
+        "data": {
+          "update_interval": "Update interval",
+          "severity_filter": "Minimum severity level",
+          "language": "Language",
+          "enable_plume_calculation": "Enable plume calculation",
+          "weather_entity": "Weather entity"
+        },
+        "data_description": {
+          "update_interval": "How often (in seconds) to check for alerts",
+          "weather_entity": "Select a weather entity for plume calculations",
+          "language": "Language for interface and notifications"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "alert_count": {
+        "name": "Active Alerts"
+      },
+      "severe_alerts": {
+        "name": "Severe Alerts"
+      },
+      "historical_alerts": {
+        "name": "Historical Alerts"
+      },
+      "plume_status": {
+        "name": "Plume Status"
+      }
+    }
+  },
+  "services": {
+    "test_alert": {
+      "name": "Test Alert Simulation",
+      "description": "Create a test alert to verify the smoke plume detector functionality"
+    },
+    "reset_alerts": {
+      "name": "Reset All Alerts",
+      "description": "Clear all active and historical alerts from the system"
+    }
+  }
+}
