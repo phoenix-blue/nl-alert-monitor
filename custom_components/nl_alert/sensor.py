@@ -204,11 +204,26 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
         
         # Return info about the most recent alert
         latest_alert = alerts[0] if alerts else {}
+        
+        # Extract info data (can be list or dict)
+        info_data = {}
+        if isinstance(latest_alert.get("info"), list) and len(latest_alert["info"]) > 0:
+            info_data = latest_alert["info"][0]
+        elif isinstance(latest_alert.get("info"), dict):
+            info_data = latest_alert["info"]
+        
+        # Extract area description
+        area_desc = ""
+        if isinstance(info_data.get("area"), list) and len(info_data["area"]) > 0:
+            area_desc = info_data["area"][0].get("areaDesc", "")
+        elif isinstance(info_data.get("area"), dict):
+            area_desc = info_data["area"].get("areaDesc", "")
+        
         return {
             ATTR_ALERT_ID: latest_alert.get("identifier"),
-            ATTR_SEVERITY: latest_alert.get("severity"),
-            ATTR_AREAS: latest_alert.get("areaDesc"),
-            ATTR_DESCRIPTION: latest_alert.get("headline"),
+            ATTR_SEVERITY: info_data.get("severity"),
+            ATTR_AREAS: area_desc,
+            ATTR_DESCRIPTION: info_data.get("headline"),
         }
 
     def _direction_to_compass(self, bearing: float) -> str:

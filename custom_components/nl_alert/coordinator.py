@@ -143,8 +143,15 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             
             # Check each active alert for chemical/hazardous content
             for alert in active_alerts:
-                headline = alert.get("headline", "").lower()
-                description = alert.get("description", "").lower()
+                # Extract info data (can be list or dict)
+                info_data = {}
+                if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                    info_data = alert["info"][0]
+                elif isinstance(alert.get("info"), dict):
+                    info_data = alert["info"]
+                
+                headline = info_data.get("headline", "").lower()
+                description = info_data.get("description", "").lower()
                 
                 # Check if alert is chemical/fire/hazardous related
                 is_chemical = any(keyword in headline + " " + description for keyword in [
@@ -185,7 +192,7 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             "wind_direction": weather_data.get("wind_direction", 180),
                             "plume_direction": plume_direction,
                             "concentration": risk_percentage / 100.0,
-                            "alert_headline": alert.get("headline", ""),
+                            "alert_headline": info_data.get("headline", ""),
                             "message": f"🌨️ Rookpluim risico: {risk_percentage:.1f}% op {distance_km:.1f}km afstand",
                             "weather_data": weather_data,
                         }
@@ -200,7 +207,7 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             "wind_direction": weather_data.get("wind_direction", 180),
                             "plume_direction": 45,
                             "concentration": 0.25,
-                            "alert_headline": alert.get("headline", ""),
+                            "alert_headline": info_data.get("headline", ""),
                             "message": "🌨️ Rookpluim detector - berekening niet beschikbaar",
                             "weather_data": weather_data,
                         }

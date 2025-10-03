@@ -119,12 +119,27 @@ class NLAlertBinarySensor(CoordinatorEntity[NLAlertCoordinator], BinarySensorEnt
         elif self.entity_description.key == "severe_alert":
             severe_alerts = []
             for alert in self.coordinator.data.get("alerts", []):
-                if alert.get("severity") in ["Severe", "Extreme"]:
+                # Extract info data (can be list or dict)
+                info_data = {}
+                if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                    info_data = alert["info"][0]
+                elif isinstance(alert.get("info"), dict):
+                    info_data = alert["info"]
+                
+                severity = info_data.get("severity")
+                if severity in ["Severe", "Extreme"]:
+                    # Extract area description
+                    area_desc = ""
+                    if isinstance(info_data.get("area"), list) and len(info_data["area"]) > 0:
+                        area_desc = info_data["area"][0].get("areaDesc", "")
+                    elif isinstance(info_data.get("area"), dict):
+                        area_desc = info_data["area"].get("areaDesc", "")
+                    
                     severe_alerts.append({
                         "id": alert.get("identifier"),
-                        "severity": alert.get("severity"),
-                        "headline": alert.get("headline"),
-                        "areas": alert.get("areaDesc"),
+                        "severity": severity,
+                        "headline": info_data.get("headline"),
+                        "areas": area_desc,
                     })
             attrs["severe_alerts"] = severe_alerts[:5]  # Laatste 5 ernstige alerts
             

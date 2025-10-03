@@ -110,7 +110,14 @@ class NLAlertAPI:
         counts = {"Minor": 0, "Moderate": 0, "Severe": 0, "Extreme": 0}
         
         for alert in self.get_active_alerts():
-            severity = alert.get("severity", "Unknown")
+            # Extract info data (can be list or dict)
+            info_data = {}
+            if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                info_data = alert["info"][0]
+            elif isinstance(alert.get("info"), dict):
+                info_data = alert["info"]
+            
+            severity = info_data.get("severity", "Unknown")
             if severity in counts:
                 counts[severity] += 1
         
