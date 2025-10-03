@@ -29,13 +29,25 @@ Deze integratie gebruikt officiële data van:
 - **🧭 Compass Visualisatie**: Visuele weergave van windrichting en rookpluim spreiding
 - **🏠 Slimme Filtering**: Alleen relevante chemische/brand gerelateerde alerts
 - **🧪 Test & Reset Services**: Test de integratie met simulatie alerts en reset functionaliteit
-- **📊 Uitgebreide Dashboard Kaarten**: Ready-to-use Lovelace kaarten
+- **🎛️ Service Control Buttons**: Eenvoudige bediening via dashboard buttons onder Hub
+- **📊 Uitgebreide Dashboard Kaarten**: Ready-to-use Lovelace kaarten  
 - **🔄 Automatische Blueprints**: Pre-geconfigureerde automations
+
+> **💡 Tip**: Gebruik de officiële My Home Assistant badge hieronder voor directe HACS installatie!
 
 ## 📦 Installatie
 
 ### Via HACS (Aanbevolen)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Phoenix-Blue&repository=https%3A%2F%2Fgithub.com%2Fphoenix-blue%2Fnl-alert-monitor)
+
+**Eenvoudige installatie met één klik:**
+1. Klik op de bovenstaande badge om direct naar HACS te gaan
+2. De repository wordt automatisch geopend in HACS
+3. Klik "INSTALL" 
+4. Herstart Home Assistant
+
+**Handmatige HACS installatie:**
 1. Open HACS in Home Assistant
 2. Ga naar "Integrations" 
 3. Klik op de drie puntjes (⋮) rechtsboven
@@ -80,6 +92,11 @@ Deze integratie gebruikt officiële data van:
 
 Na installatie zijn de volgende entities beschikbaar:
 
+### Hub
+| Entity | Beschrijving | Icon |
+|--------|--------------|------|
+| `hub.nl_alert_integration` | 🏛️ Hoofdhub voor NL-Alert systeem | mdi:domain |
+
 ### Sensoren
 | Entity | Beschrijving | Icon |
 |--------|--------------|------|
@@ -88,13 +105,41 @@ Na installatie zijn de volgende entities beschikbaar:
 | `sensor.nl_alert_historical_alerts` | 📋 Historische alerts (30 dagen) |
 | `sensor.nl_alert_danger_compass` | 🧭 Compass met risico informatie |
 
-### Services (Test & Beheer)
+### Service Buttons (onder Hub)
+| Entity | Beschrijving | Functionaliteit |
+|--------|--------------|-----------------|
+| `button.test_nl_alert_simulatie` | 🧪 Test NL-Alert Simulatie | Activeert test alert met sample data |
+| `button.reset_alle_meldingen` | 🔄 Reset Alle Meldingen | Wist alle actieve alerts en reset status |
+| `button.force_data_update` | ⚡ Force Data Update | Geforceerde refresh van NL-Alert API |  
+| `button.wis_historische_data` | 🗑️ Wis Historische Data | Verwijdert 30-dagen alert archief |
+
+### Services (Developer Tools)
 | Service | Beschrijving | Gebruik |
 |---------|--------------|---------|
 | `nl_alert.test_alert` | 🧪 Test simulatie activeren | Developer Tools → Services |
-| `nl_alert.reset_alerts` | 🔄 Reset alle meldingen | Dashboard buttons of automations |
+| `nl_alert.reset_alerts` | 🔄 Reset alle meldingen | Automation triggers |
 
 ## 🎨 Dashboard Kaarten
+
+### Hub & Services Overzicht
+
+```yaml
+type: entities  
+title: "🏛️ NL-Alert Control Hub"
+entities:
+  - entity: hub.nl_alert_integration
+    name: "NL-Alert Hub"
+  - type: section
+    label: "Service Controls"
+  - entity: button.test_nl_alert_simulatie
+    name: "🧪 Test Simulatie" 
+  - entity: button.reset_alle_meldingen
+    name: "🔄 Reset Alerts"
+  - entity: button.force_data_update
+    name: "⚡ Force Update"
+  - entity: button.wis_historische_data
+    name: "🗑️ Wis Archief"
+```
 
 ### Basis Status Kaart
 

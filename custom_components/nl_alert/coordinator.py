@@ -200,8 +200,19 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.error("Error checking home danger: %s", e)
             return {
                 "in_danger": False,
-                "status": "error",
+                "status": "error", 
                 "risk_percentage": 0,
                 "message": f"Fout bij gevarencheck: {e}",
                 "weather_data": {},
             }
+
+    async def clear_historical_data(self) -> None:
+        """Clear historical alerts data."""
+        try:
+            self.historical_alerts = []
+            _LOGGER.info("Historical alerts data cleared")
+            # Trigger update to notify all listeners
+            await self.async_refresh()
+        except Exception as e:
+            _LOGGER.error(f"Error clearing historical data: {e}")
+            raise
