@@ -89,6 +89,7 @@ class NLAlertServiceButton(CoordinatorEntity[NLAlertCoordinator], ButtonEntity):
     async def _execute_test_alert(self) -> None:
         """Execute test alert service."""
         try:
+            _LOGGER.info("🧪 Button: Executing test alert service...")
             # Call the test alert service through coordinator
             await self.hass.services.async_call(
                 DOMAIN,
@@ -96,7 +97,7 @@ class NLAlertServiceButton(CoordinatorEntity[NLAlertCoordinator], ButtonEntity):
                 {},
                 blocking=True,
             )
-            _LOGGER.info("Test alert service executed successfully")
+            _LOGGER.info("✅ Button: Test alert service executed successfully")
         except Exception as e:
             _LOGGER.error(f"Error executing test alert service: {e}")
 
@@ -117,10 +118,11 @@ class NLAlertServiceButton(CoordinatorEntity[NLAlertCoordinator], ButtonEntity):
     async def _execute_force_update(self) -> None:
         """Force data update from NL-Alert API."""
         try:
+            _LOGGER.info("⚡ Button: Forcing data update from NL-Alert API...")
             await self.coordinator.async_refresh()
-            _LOGGER.info("Force update completed successfully")
+            _LOGGER.info("✅ Button: Force update completed successfully")
         except Exception as e:
-            _LOGGER.error(f"Error during force update: {e}")
+            _LOGGER.error(f"❌ Button: Error during force update: {e}")
 
     async def _execute_clear_historical(self) -> None:
         """Clear historical alerts data."""

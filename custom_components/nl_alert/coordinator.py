@@ -51,36 +51,53 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from NL-Alert API."""
         try:
-            # Haal alerts op
-            alerts = await self.api.async_get_alerts()
+            # Haal actuele alerts op (voor current status)
+            current_alerts = await self.api.async_get_alerts()
             active_alerts = self.api.get_active_alerts()
             
-            # Add new alerts to historical collection (only chemical/hazardous material alerts)
-            for alert in alerts:
+            # Haal recente alerts op (afgelopen 24h voor historical data)
+            recent_alerts = await self.api.async_get_recent_alerts()
+            _LOGGER.info(f"🔍 Retrieved {len(current_alerts)} current alerts and {len(recent_alerts)} recent alerts")
+            
+            # Add recent alerts to historical collection (only chemical/hazardous material alerts)
+            for alert in recent_alerts:
                 alert_id = alert.get("identifier")
-                headline = alert.get("headline", "").lower()
+                
+                # Extract headline from info section
+                headline = ""
+                description = ""
+                if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                    info = alert["info"][0]
+                    headline = info.get("headline", "").lower()
+                    description = info.get("description", "").lower()
+                elif isinstance(alert.get("info"), dict):
+                    headline = alert["info"].get("headline", "").lower()
+                    description = alert["info"].get("description", "").lower()
                 
                 # Only keep alerts related to chemical incidents, fires, or hazardous materials
-                is_relevant = any(keyword in headline for keyword in [
+                is_relevant = any(keyword in headline + " " + description for keyword in [
                     "chemisch", "brand", "rookontwikkeling", "giftige", "schadelijk", 
                     "gevaarlijk", "stof", "gas", "rook", "ontploffing", "lekkage",
-                    "chemical", "fire", "smoke", "toxic", "hazardous", "dangerous"
+                    "chemical", "fire", "smoke", "toxic", "hazardous", "dangerous",
+                    "ammonia", "ammoniak", "chlor", "benzeen", "chloor"
                 ])
                 
                 if alert_id and is_relevant and not any(h_alert.get("identifier") == alert_id for h_alert in self._historical_alerts):
                     # Add timestamp for cleanup
                     alert["stored_at"] = datetime.now().isoformat()
                     self._historical_alerts.append(alert)
+                    _LOGGER.debug(f"➕ Added relevant alert to history: {headline[:50]}...")
             
-            # Clean up old historical alerts (keep only last 30 days and max 25 alerts)
+            # Clean up old historical alerts (keep only last 30 days and max 50 alerts)
             cutoff_date = datetime.now() - timedelta(days=30)
             self._historical_alerts = [
-                alert for alert in self._historical_alerts[-25:]  # Max 25 alerts
+                alert for alert in self._historical_alerts[-50:]  # Max 50 alerts
                 if alert.get("stored_at")
             ]
 
             data = {
-                "alerts": alerts,
+                "alerts": current_alerts,
+                "recent_alerts": recent_alerts,
                 "active_alerts": active_alerts,
                 "active_count": len(active_alerts),
                 "alert_count": len(active_alerts),
@@ -206,10 +223,20 @@ class NLAlertCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "weather_data": {},
             }
 
+    @property
+    def historical_alerts(self) -> list[dict[str, Any]]:
+        """Get historical alerts list."""
+        return self._historical_alerts
+    
+    @historical_alerts.setter
+    def historical_alerts(self, value: list[dict[str, Any]]) -> None:
+        """Set historical alerts list."""
+        self._historical_alerts = value
+
     async def clear_historical_data(self) -> None:
         """Clear historical alerts data."""
         try:
-            self.historical_alerts = []
+            self._historical_alerts = []
             _LOGGER.info("Historical alerts data cleared")
             # Trigger update to notify all listeners
             await self.async_refresh()

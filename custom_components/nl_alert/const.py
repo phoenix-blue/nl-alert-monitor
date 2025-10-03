@@ -16,6 +16,7 @@ CONF_WEATHER_ENTITY: Final = "weather_entity"
 # API constants
 API_BASE_URL: Final = "https://api.public-warning.app/api/v1"
 API_ENDPOINT_ALERTS: Final = f"{API_BASE_URL}/providers/nl-alert/alerts"
+API_ENDPOINT_RECENT_ALERTS: Final = f"{API_BASE_URL}/providers/nl-alert/alerts?filter=last-24h"
 
 # Default values
 DEFAULT_UPDATE_INTERVAL: Final = 300  # 5 minutes

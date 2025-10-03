@@ -12,6 +12,7 @@ import async_timeout
 
 from .const import (
     API_ENDPOINT_ALERTS,
+    API_ENDPOINT_RECENT_ALERTS,
     KNMI_STATIONS_ENDPOINT,
     PLUME_STATUS_SAFE,
     PLUME_STATUS_CAUTION, 
@@ -32,26 +33,49 @@ class NLAlertAPI:
         self._alerts: list[dict[str, Any]] = []
 
     async def async_get_alerts(self) -> list[dict[str, Any]]:
-        """Get current alerts from NL-Alert API."""
+        """Get current active alerts from NL-Alert API."""
         try:
             async with async_timeout.timeout(10):
                 async with self.session.get(API_ENDPOINT_ALERTS) as response:
                     if response.status == 200:
                         data = await response.json()
                         self._alerts = data.get("alerts", [])
-                        _LOGGER.debug("Retrieved %d alerts", len(self._alerts))
+                        _LOGGER.debug("Retrieved %d current alerts", len(self._alerts))
                         return self._alerts
                     else:
-                        _LOGGER.error("API returned status %d", response.status)
+                        _LOGGER.error("API returned status %d for current alerts", response.status)
                         return []
         except asyncio.TimeoutError:
-            _LOGGER.error("Timeout while fetching alerts")
+            _LOGGER.error("Timeout while fetching current alerts")
             return []
         except aiohttp.ClientError as err:
-            _LOGGER.error("Client error while fetching alerts: %s", err)
+            _LOGGER.error("Client error while fetching current alerts: %s", err)
             return []
         except Exception as err:
-            _LOGGER.error("Unexpected error while fetching alerts: %s", err)
+            _LOGGER.error("Unexpected error while fetching current alerts: %s", err)
+            return []
+
+    async def async_get_recent_alerts(self) -> list[dict[str, Any]]:
+        """Get recent alerts from last 24h for historical data."""
+        try:
+            async with async_timeout.timeout(10):
+                async with self.session.get(API_ENDPOINT_RECENT_ALERTS) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        recent_alerts = data.get("alerts", [])
+                        _LOGGER.debug("Retrieved %d recent alerts (last 24h)", len(recent_alerts))
+                        return recent_alerts
+                    else:
+                        _LOGGER.error("API returned status %d for recent alerts", response.status)
+                        return []
+        except asyncio.TimeoutError:
+            _LOGGER.error("Timeout while fetching recent alerts")
+            return []
+        except aiohttp.ClientError as err:
+            _LOGGER.error("Client error while fetching recent alerts: %s", err)
+            return []
+        except Exception as err:
+            _LOGGER.error("Unexpected error while fetching recent alerts: %s", err)
             return []
 
     def get_active_alerts(self) -> list[dict[str, Any]]:

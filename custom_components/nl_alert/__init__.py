@@ -8,7 +8,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Any
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -102,6 +102,7 @@ async def _register_services(hass: HomeAssistant, coordinator) -> None:
             "scope": "Public",
             "status": "Actual",
             "sent": datetime.now(timezone.utc).isoformat(),
+            "expires": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat(),
             "info": [{
                 "language": "nl-NL",
                 "category": "CBRN",
@@ -123,28 +124,62 @@ async def _register_services(hass: HomeAssistant, coordinator) -> None:
             }]
         }
         
-        # Ensure coordinator data exists
+        # Ensure coordinator data exists and is properly structured
         if coordinator.data is None:
-            coordinator.data = {"alerts": []}
+            coordinator.data = {
+                "alerts": [],
+                "recent_alerts": [],
+                "active_alerts": [],
+                "active_count": 0,
+                "alert_count": 0,
+                "severity_counts": {"Severe": 0, "Extreme": 0},
+                "severe_count": 0,
+                "has_severe_alerts": False,
+                "historical_alerts": [],
+                "historical_count": 0,
+            }
         
-        # Add to coordinator data
-        coordinator.data["alerts"].insert(0, test_alert)
+        # Add test alert to current alerts and recent alerts
+        coordinator.data["alerts"] = [test_alert] + coordinator.data.get("alerts", [])
+        coordinator.data["recent_alerts"] = [test_alert] + coordinator.data.get("recent_alerts", [])
+        coordinator.data["active_alerts"] = [test_alert]
+        coordinator.data["active_count"] = 1
+        coordinator.data["alert_count"] = 1
+        coordinator.data["severity_counts"] = {"Severe": 1, "Extreme": 0}
+        coordinator.data["severe_count"] = 1
+        coordinator.data["has_severe_alerts"] = True
+        
+        # Also add to historical data
+        test_alert["stored_at"] = datetime.now().isoformat()
+        coordinator.data["historical_alerts"] = [test_alert] + coordinator.data.get("historical_alerts", [])
+        coordinator.data["historical_count"] = len(coordinator.data["historical_alerts"])
+        
+        # Force update all entities
         coordinator.async_set_updated_data(coordinator.data)
         
-        _LOGGER.info("✅ Test alert created successfully")
+        _LOGGER.info("✅ Test alert created successfully - Data updated in coordinator")
     
     async def async_reset_alerts(call: ServiceCall) -> None:
         """Service to reset all alerts."""
         _LOGGER.info("🔄 NL-Alert reset alerts service called")
         
-        # Ensure coordinator data exists
-        if coordinator.data is None:
-            coordinator.data = {"alerts": []}
-        else:
-            coordinator.data["alerts"] = []
+        # Reset all alert data
+        coordinator.data = {
+            "alerts": [],
+            "recent_alerts": [],
+            "active_alerts": [],
+            "active_count": 0,
+            "alert_count": 0,
+            "severity_counts": {"Severe": 0, "Extreme": 0},
+            "severe_count": 0,
+            "has_severe_alerts": False,
+            "historical_alerts": [],
+            "historical_count": 0,
+        }
         
+        # Force update all entities
         coordinator.async_set_updated_data(coordinator.data)
-        _LOGGER.info("✅ All alerts have been reset")
+        _LOGGER.info("✅ All alerts have been reset - Data cleared from coordinator")
     
     # Only register if not already registered
     if not hass.services.has_service(DOMAIN, "test_alert"):

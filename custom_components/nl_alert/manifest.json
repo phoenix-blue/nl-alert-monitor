@@ -1,7 +1,7 @@
 {
   "domain": "nl_alert",
   "name": "🌨️ NL-Alert Rookpluim Detector",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "documentation": "https://github.com/phoenix-blue/nl-alert-monitor",
   "issue_tracker": "https://github.com/phoenix-blue/nl-alert-monitor/issues",
   "dependencies": [],
