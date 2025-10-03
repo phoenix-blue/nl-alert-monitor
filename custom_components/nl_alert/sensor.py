@@ -138,18 +138,35 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
         """Return additional state attributes."""
         if self.entity_description.key == "historical_alerts":
             historical_alerts = self.coordinator.data.get("historical_alerts", [])
+            
+            # Extract and flatten alert data from nested info structure
+            formatted_alerts = []
+            for alert in historical_alerts[-10:]:  # Last 10 for attributes
+                # Extract info data (can be list or dict)
+                info_data = {}
+                if isinstance(alert.get("info"), list) and len(alert["info"]) > 0:
+                    info_data = alert["info"][0]
+                elif isinstance(alert.get("info"), dict):
+                    info_data = alert["info"]
+                
+                # Extract area description
+                area_desc = ""
+                if isinstance(info_data.get("area"), list) and len(info_data["area"]) > 0:
+                    area_desc = info_data["area"][0].get("areaDesc", "")
+                elif isinstance(info_data.get("area"), dict):
+                    area_desc = info_data["area"].get("areaDesc", "")
+                
+                formatted_alerts.append({
+                    "id": alert.get("identifier"),
+                    "ernst": info_data.get("severity"),
+                    "gebied": area_desc,
+                    "beschrijving": info_data.get("headline"),
+                    "verstuurd": alert.get("sent"),
+                    "geldig_tot": alert.get("expires"),
+                })
+            
             return {
-                "historische_meldingen": [
-                    {
-                        "id": alert.get("identifier"),
-                        "ernst": alert.get("severity"),
-                        "gebied": alert.get("areaDesc"),
-                        "beschrijving": alert.get("headline"),
-                        "verstuurd": alert.get("sent"),
-                        "geldig_tot": alert.get("expires"),
-                    }
-                    for alert in historical_alerts[-10:]  # Last 10 for attributes
-                ],
+                "historische_meldingen": formatted_alerts,
                 "totaal_aantal": len(historical_alerts),
             }
         elif self.entity_description.key == "danger_compass":
@@ -187,11 +204,26 @@ class NLAlertSensor(CoordinatorEntity, SensorEntity):
         
         # Return info about the most recent alert
         latest_alert = alerts[0] if alerts else {}
+        
+        # Extract info data (can be list or dict)
+        info_data = {}
+        if isinstance(latest_alert.get("info"), list) and len(latest_alert["info"]) > 0:
+            info_data = latest_alert["info"][0]
+        elif isinstance(latest_alert.get("info"), dict):
+            info_data = latest_alert["info"]
+        
+        # Extract area description
+        area_desc = ""
+        if isinstance(info_data.get("area"), list) and len(info_data["area"]) > 0:
+            area_desc = info_data["area"][0].get("areaDesc", "")
+        elif isinstance(info_data.get("area"), dict):
+            area_desc = info_data["area"].get("areaDesc", "")
+        
         return {
             ATTR_ALERT_ID: latest_alert.get("identifier"),
-            ATTR_SEVERITY: latest_alert.get("severity"),
-            ATTR_AREAS: latest_alert.get("areaDesc"),
-            ATTR_DESCRIPTION: latest_alert.get("headline"),
+            ATTR_SEVERITY: info_data.get("severity"),
+            ATTR_AREAS: area_desc,
+            ATTR_DESCRIPTION: info_data.get("headline"),
         }
 
     def _direction_to_compass(self, bearing: float) -> str:
